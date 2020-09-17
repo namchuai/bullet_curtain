@@ -10,9 +10,51 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center" />
 
+    <View
+        android:id="@+id/top_scrim"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="@drawable/top_scrim"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_logo"
+        android:visibility="gone" />
+
+    <View
+        android:id="@+id/bottom_scrim"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="@drawable/bottom_scrim"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tvStory"
+        android:layout_width="match_parent"
+        android:layout_height="96dp"
+        android:layout_gravity="bottom"
+        android:fontFamily="@font/nunitosans_regular"
+        android:paddingLeft="13dp"
+        android:paddingTop="16dp"
+        android:paddingRight="13dp"
+        android:paddingBottom="23dp"
+        android:text="Sợ em biết, lại sợ em không biết. Muốn em biết lại muốn em không biết. Mà em biết thêm lại sợ em không biết. Muốn em biết lại em biết.."
+        android:textColor="@android:color/white"
+        android:textSize="15sp" />
+
     <TextureView
         android:id="@+id/canvasTextureView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
+    <ai.techlab.bulletcurtain.VideoInteractionBox
+        android:layout_width="45dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|bottom"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="116dp" />
 
 </FrameLayout>

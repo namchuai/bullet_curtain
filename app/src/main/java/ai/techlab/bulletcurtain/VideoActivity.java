@@ -1,4 +1,4 @@
-package ai.techlab.bulletcurtain.test;
+package ai.techlab.bulletcurtain;
 
 import android.content.res.Resources;
 import android.graphics.Canvas;
@@ -6,37 +6,32 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PorterDuff;
 import android.graphics.SurfaceTexture;
-import android.media.browse.MediaBrowser;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Surface;
 import android.view.TextureView;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
-import com.google.android.exoplayer2.extractor.ogg.OggExtractor;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.RawResourceDataSource;
 import com.google.android.exoplayer2.video.VideoListener;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import ai.techlab.bulletcurtain.Bullet;
-import ai.techlab.bulletcurtain.MockBulletProvider;
-import ai.techlab.bulletcurtain.R;
 
 public class VideoActivity extends AppCompatActivity implements VideoListener {
     private static final String TAG = "TextureViewCanvasActivi";
@@ -45,6 +40,10 @@ public class VideoActivity extends AppCompatActivity implements VideoListener {
     private Renderer mRenderer;
     private TextureView mVideoView;
     private SimpleExoPlayer player;
+
+    private View mTopScrim;
+    private View mBottomScrim;
+    private ImageView mLogo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +55,10 @@ public class VideoActivity extends AppCompatActivity implements VideoListener {
         setContentView(R.layout.activity_video);
         mVideoView = findViewById(R.id.video_view);
 
+        mTopScrim = findViewById(R.id.top_scrim);
+        mBottomScrim = findViewById(R.id.bottom_scrim);
+        mLogo = findViewById(R.id.logo);
+
         mCurtainView = findViewById(R.id.canvasTextureView);
         mCurtainView.setSurfaceTextureListener(mRenderer);
         mCurtainView.setOpaque(false);
@@ -65,7 +68,7 @@ public class VideoActivity extends AppCompatActivity implements VideoListener {
 
     private void initPlayer() {
         player = new SimpleExoPlayer.Builder(getApplicationContext()).build();
-        player.prepare(buildMediaSource(Uri.parse("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")));
+//        player.prepare(buildMediaSource(Uri.parse("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")));
         player.prepare(buildRawMediaSource());
         player.setPlayWhenReady(true);
         player.setRepeatMode(Player.REPEAT_MODE_ALL);
@@ -104,11 +107,48 @@ public class VideoActivity extends AppCompatActivity implements VideoListener {
         }
     }
 
+    private int dpToPx(int dp) {
+        return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
+    }
+
     @Override
     public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
         Log.d(TAG, "onVideoSizeChanged: ");
         int yOffset = adjustAspectRatio(mVideoView, width, height);
-//        adjustAspectRatio(mCurtainView, width, height);
+
+        // TODO better listen to pogress change from exoplayer.
+
+        {
+            // Setting up the scrim
+            mTopScrim.setVisibility(View.VISIBLE);
+
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    dpToPx(70)
+            );
+            params.setMargins(0, yOffset, 0, 0);
+            mTopScrim.setLayoutParams(params);
+
+            mBottomScrim.setVisibility(View.VISIBLE);
+
+            FrameLayout.LayoutParams params1 = new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    dpToPx(70)
+            );
+            params1.setMargins(0, yOffset + height - dpToPx(70), 0, 0);
+            mBottomScrim.setLayoutParams(params1);
+        }
+
+        {
+            mLogo.setVisibility(View.VISIBLE);
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                    dpToPx(55),
+                    dpToPx(43)
+            );
+            params.setMargins(dpToPx(13), yOffset + height - dpToPx(43) - dpToPx(9), 0, 0);
+            mLogo.setLayoutParams(params);
+        }
+
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT

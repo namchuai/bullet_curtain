@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="45dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/video_interaction_box_bg"
+    android:orientation="vertical"
+    android:paddingTop="18dp"
+    android:paddingBottom="18dp">
+
+    <TextView
+        android:id="@+id/tvLike"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawablePadding="4dp"
+        android:fontFamily="@font/nunitosans_regular"
+        android:gravity="center"
+        android:paddingBottom="15dp"
+        android:text="122"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        app:drawableTopCompat="@drawable/ic_white_like" />
+
+    <TextView
+        android:id="@+id/tvComment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawablePadding="4dp"
+        android:fontFamily="@font/nunitosans_regular"
+        android:gravity="center"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp"
+        android:text="156"
+        android:textColor="@android:color/white"
+        app:drawableTopCompat="@drawable/ic_white_comment" />
+
+    <TextView
+        android:id="@+id/tvShare"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawablePadding="4dp"
+        android:fontFamily="@font/nunitosans_regular"
+        android:gravity="center"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp"
+        android:text="8"
+        android:textColor="@android:color/white"
+        app:drawableTopCompat="@drawable/ic_white_share" />
+
+    <TextView
+        android:id="@+id/tvTip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawablePadding="4dp"
+        android:fontFamily="@font/nunitosans_regular"
+        android:gravity="center"
+        android:paddingTop="15dp"
+        android:text="Tip"
+        android:textColor="@android:color/white"
+        app:drawableTopCompat="@drawable/ic_white_tip" />
+
+</LinearLayout>
