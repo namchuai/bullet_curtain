@@ -4,6 +4,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.text.TextPaint;
+import android.util.TypedValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,24 +13,23 @@ import java.util.Random;
 public class MockBulletProvider {
     public static final int DRAW_RATE = 16;
     public final int mScreenWidth;
-    public static final int MARGIN_BETWEEN_BULLET = 46; // TODO convert from dp to pixel
+    public final int mMarginBetweenBulletLow;
+    public final int mMarginBetweenBulletMid;
+    public final int mMarginBetweenBulletHigh;
     public static final int VIDEO_TIME_IN_MILLIS = 1000;
-    private static final int TEXT_SIZE = 48; // TODO
+    private final float mTextSize;
 
-    private static final int TRACK_PADDING = 16;
+    private static final int TRACK_PADDING = 8;
 
     private static final int[] colors = {
-            Color.BLACK,
-//            Color.DKGRAY,
-//            Color.GRAY,
-//            Color.LTGRAY,
-//            Color.WHITE,
-            Color.RED,
-            Color.GREEN,
-            Color.BLUE,
-            Color.YELLOW,
-            Color.CYAN,
-            Color.MAGENTA
+            Color.WHITE,
+            Color.WHITE,
+//            Color.RED,
+//            Color.GREEN,
+//            Color.BLUE,
+//            Color.YELLOW,
+//            Color.CYAN,
+//            Color.MAGENTA
     };
 
     private Resources resources;
@@ -37,13 +37,29 @@ public class MockBulletProvider {
     public MockBulletProvider(Resources resources) {
         this.resources = resources;
         mScreenWidth = Resources.getSystem().getDisplayMetrics().widthPixels;
+
+        // Text size
+        int spSize = 17;
+        float scaledSizeInPixels = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,
+                spSize, resources.getDisplayMetrics());
+
+        mTextSize = scaledSizeInPixels;
+
+        // margin between text
+        mMarginBetweenBulletLow = dpToPx(44);
+        mMarginBetweenBulletMid = dpToPx(56);
+        mMarginBetweenBulletHigh = dpToPx(89);
+    }
+
+    private int dpToPx(int dp) {
+        return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
     }
 
     private static final String[] comments = {
             "Chúc mừng bạn đã vào khu dân cư may mắn nhất năm",
             "Page mất hút lâu vãi. Search thì vẫn có mà k thấy tương tác đâu :)))))",
             "Chờ page mãi",
-            "Fage quay lại thật rồi",
+            "Page quay lại thật rồi",
             "Tuyệt vời",
             "tính bán đi, đang tính bán thêm torreira gom tiền mua aouar",
             "Martinez muốn đi để đc bắt chính nhiều hơn nên ko kí hợp đồng mới chứ ko phải Ars muốn bán.",
@@ -107,7 +123,7 @@ public class MockBulletProvider {
 
     private TextPaint provideRandomTextPaint() {
         TextPaint textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        textPaint.setTextSize(TEXT_SIZE);
+        textPaint.setTextSize(mTextSize);
         textPaint.setLinearText(true);
         textPaint.setTypeface(resources.getFont(R.font.nunitosans_regular));
         textPaint.setColor(colors[new Random(System.currentTimeMillis()).nextInt(colors.length - 1)]);
@@ -126,7 +142,8 @@ public class MockBulletProvider {
                 bullets.get(i).x = preferX;
                 padding += preferX + bullets.get(i).measuredWidth;
             }
-            padding += MARGIN_BETWEEN_BULLET;
+            padding += bullets.get(i).speed == Bullet.BulletSpeed.LOW ? mMarginBetweenBulletLow : bullets.get(i).speed == Bullet.BulletSpeed.MEDIUM ? mMarginBetweenBulletMid :
+                    mMarginBetweenBulletHigh;
         }
     }
 }

@@ -6,21 +6,29 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PorterDuff;
 import android.graphics.SurfaceTexture;
+import android.media.browse.MediaBrowser;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Surface;
 import android.view.TextureView;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.extractor.ogg.OggExtractor;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.upstream.RawResourceDataSource;
 import com.google.android.exoplayer2.video.VideoListener;
 
 import java.util.List;
@@ -33,7 +41,7 @@ import ai.techlab.bulletcurtain.R;
 public class VideoActivity extends AppCompatActivity implements VideoListener {
     private static final String TAG = "TextureViewCanvasActivi";
 
-    private TextureView mTextureView;
+    private TextureView mCurtainView;
     private Renderer mRenderer;
     private TextureView mVideoView;
     private SimpleExoPlayer player;
@@ -44,14 +52,13 @@ public class VideoActivity extends AppCompatActivity implements VideoListener {
 
         List<Bullet> bullets = new MockBulletProvider(getResources()).getBullets();
         mRenderer = new Renderer(bullets);
-        mRenderer.start();
 
         setContentView(R.layout.activity_video);
         mVideoView = findViewById(R.id.video_view);
 
-        mTextureView = findViewById(R.id.canvasTextureView);
-        mTextureView.setSurfaceTextureListener(mRenderer);
-        mTextureView.setOpaque(false);
+        mCurtainView = findViewById(R.id.canvasTextureView);
+        mCurtainView.setSurfaceTextureListener(mRenderer);
+        mCurtainView.setOpaque(false);
 
         initPlayer();
     }
@@ -59,6 +66,7 @@ public class VideoActivity extends AppCompatActivity implements VideoListener {
     private void initPlayer() {
         player = new SimpleExoPlayer.Builder(getApplicationContext()).build();
         player.prepare(buildMediaSource(Uri.parse("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")));
+        player.prepare(buildRawMediaSource());
         player.setPlayWhenReady(true);
         player.setRepeatMode(Player.REPEAT_MODE_ALL);
         player.setVideoTextureView(mVideoView);
@@ -70,6 +78,19 @@ public class VideoActivity extends AppCompatActivity implements VideoListener {
                 new DefaultDataSourceFactory(this, "namh-test");
         return new ProgressiveMediaSource.Factory(dataSourceFactory)
                 .createMediaSource(uri);
+    }
+
+    private MediaSource buildRawMediaSource() {
+        Uri uri = RawResourceDataSource.buildRawResourceUri(R.raw.horses);
+
+        ExtractorMediaSource audioSource = new ExtractorMediaSource(
+                uri,
+                new DefaultDataSourceFactory(this, "MyExoplayer"),
+                new DefaultExtractorsFactory(),
+                null,
+                null
+        );
+        return audioSource;
     }
 
     @Override
@@ -86,11 +107,20 @@ public class VideoActivity extends AppCompatActivity implements VideoListener {
     @Override
     public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
         Log.d(TAG, "onVideoSizeChanged: ");
-        adjustAspectRatio(mVideoView, width, height);
-        adjustAspectRatio(mTextureView, width, height);
+        int yOffset = adjustAspectRatio(mVideoView, width, height);
+//        adjustAspectRatio(mCurtainView, width, height);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+
+        params.setMargins(0, yOffset, 0, 0);
+
+        mCurtainView.setLayoutParams(params);
+        mRenderer.start();
     }
 
-    private void adjustAspectRatio(TextureView view, int videoWidth, int videoHeight) {
+    private int adjustAspectRatio(TextureView view, int videoWidth, int videoHeight) {
         int viewWidth = view.getWidth();
         int viewHeight = view.getHeight();
         double aspectRatio = (double) videoHeight / videoWidth;
@@ -115,9 +145,11 @@ public class VideoActivity extends AppCompatActivity implements VideoListener {
         Matrix txform = new Matrix();
         view.getTransform(txform);
         txform.setScale((float) newWidth / viewWidth, (float) newHeight / viewHeight);
-        //txform.postRotate(10);          // just for fun
+//        txform.postRotate(10);          // just for fun
         txform.postTranslate(xoff, yoff);
         view.setTransform(txform);
+
+        return yoff;
     }
 
     /**
